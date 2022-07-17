@@ -16,7 +16,10 @@ class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(150), nullable=False, unique=True)
+    PhonNum = db.Column(db.String(11), nullable=False, unique=True)
     status = db.Column(db.Boolean, default=False, nullable=False)
+
 
     user_roles = db.relationship('UserRoles', backref='users', lazy=True)
     licenses = db.relationship('Licences', backref='users', lazy=True)
@@ -69,6 +72,7 @@ class Settings(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id', ondelete='CASCADE'), nullable=False)
 
     commands = db.relationship('Commands', backref='settings', lazy=True)
+    schedules = db.relationship('Schedules', backref='settings', lazy=True)
 
 
 class Schedules(db.Model):
@@ -78,6 +82,8 @@ class Schedules(db.Model):
     date1 = db.Column(db.DateTime, nullable=False)
     date2 = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.Boolean, default=False, nullable=False)
+
+    setting_id = db.Column(db.Integer, db.ForeignKey('settings.id', ondelete='CASCADE'), nullable=False)
 
 
 class Devices(db.Model):

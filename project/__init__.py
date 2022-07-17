@@ -1,5 +1,5 @@
 from flask import Flask
-from project.views import db
+from project.views import views
 import secrets 
 import os 
 
@@ -32,11 +32,8 @@ def create_app():
 
     from project import views
     from .views import views as views_blueprint
-    from .auth import auth as auth_blueprint
 
-    app.register_blueprint(views_blueprint)
-    app.register_blueprint(auth_blueprint)
-    db.init_app(app)
+    app.register_blueprint(views_blueprint)     
     
 
     return app
