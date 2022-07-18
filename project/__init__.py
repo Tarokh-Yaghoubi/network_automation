@@ -2,6 +2,7 @@ from flask import Flask
 from project.views import views
 import secrets 
 import os 
+from project.views import page_not_found
 
 """ Flask Application Factory """
 
@@ -16,9 +17,12 @@ secret_key = secrets.token_hex(16)
 
 def create_app():
 
+    
     app = Flask(__name__)
     app.config['SECRET_KEY'] = secret_key
+    app.register_error_handler(404, page_not_found)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?{5}'.format(
+    
        
         username, 
         passwd, 
