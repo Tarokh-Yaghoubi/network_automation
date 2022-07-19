@@ -2,6 +2,8 @@ from flask import (
     flash, render_template, request, redirect, url_for, session
 )
 
+from werkzeug.security import generate_password_hash, check_password_hash
+
 from project.models import Users, db
  
 from flask_login import login_required
@@ -10,7 +12,7 @@ from flask import make_response
 
 from flask import Blueprint
 
-import hashlib
+from flask import render_template_string
 
 
 auth = Blueprint('auth', __name__)
@@ -32,30 +34,53 @@ def register():
         email = request.form['email']
         phone = request.form['phone']
         password = request.form['password']
-        password = generate_password_hash(password)
 
+        password_hash = generate_password_hash(password)
 
-        response = make_response(render_template('result.html', username=username, password=password, email=email))
+        response = make_response(render_template('auth_login.html'))
         session['username'] = username
         session.permanent = True
 
-        user = Users(
-            username = username,
-            email = email,
-            PhonNum = phone,
-            password = password
 
-        )
+        if Users.query.filter_by(email=email).first() or Users.query.filter_by(username=username).first() or Users.query.filter_by(PhonNum=phone).first():
 
-        db.session.add(user)
-        db.session.commit()
+            return "You have already signed-in ! , do you wanna <a href='/login'>login</a> ?"
 
-        return response
+        else : 
+
+            user = Users(
+                username = username,
+                email = email,
+                PhonNum = phone,
+                password_hash = password_hash
+    
+            )
+    
+            db.session.add(user)
+            db.session.commit()
+    
+            return response
 
     return render_template('auth_register.html')
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
+
+    if request.method == 'POST':
+        
+        username = request.form['username']        
+        password = request.form['password']
+        user = Users.query.filter_by(username=username).first()
+
+        if user and check_password_hash(user.password_hash, password):
+
+
+            return render_template('index.html', username=username)
+        
+        else:
+
+            return '<script>alert("Check your account credentials");</script>'
+
     return render_template('auth_login.html')
 
 @auth.route('/forgot_pass')

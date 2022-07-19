@@ -3,6 +3,7 @@ from flask import (
     flash, render_template, request, redirect, session
 )
 
+from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.sql import func
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -15,7 +16,7 @@ db = SQLAlchemy()
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(100), nullable=False)
+    password_hash = db.Column(db.String(250), nullable=False)
     email = db.Column(db.String(150), nullable=False, unique=True)
     PhonNum = db.Column(db.String(11), nullable=False, unique=True)
     status = db.Column(db.Boolean, default=False, nullable=False)
@@ -24,6 +25,18 @@ class Users(db.Model):
     user_roles = db.relationship('UserRoles', backref='users', lazy=True)
     licenses = db.relationship('Licences', backref='users', lazy=True)
     settings = db.relationship('Settings', backref='users', lazy=True)
+
+
+    @property
+    def password(self):
+        raise AttributeError('Password is not a readable attribute !')
+
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def varify_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 
 class Role(db.Model):
