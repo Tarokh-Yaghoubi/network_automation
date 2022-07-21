@@ -60,6 +60,12 @@ def register():
             db.session.commit()
     
             return response
+        
+    if len(phone) < 11 or len(phone) >= 12:
+
+            flash('شماره تلفن شما صحیح نیست', 'خطا')
+            return render_template('auth_register.html')
+
 
     return render_template('auth_register.html')
 
@@ -71,6 +77,9 @@ def login():
         username = request.form['username']        
         password = request.form['password']
         user = Users.query.filter_by(username=username).first()
+        
+        session['username'] = username
+        session.permanent = True
 
         if user and check_password_hash(user.password_hash, password):
 
@@ -79,7 +88,23 @@ def login():
         
         else:
 
-            return '<script>alert("Check your account credentials");</script>'
+            ''' return '<script>alert("Check your account credentials");</script>' '''
+            if not user:
+
+                flash('اطلاعات ورودی شما صحیح نمیباشد', 'خطا')
+                return render_template('auth_login.html')
+
+            elif not check_password_hash(user.password_hash, password):
+
+                flash('رمز عبور شما صحیح نمیباشد', 'خطا')
+                return render_template('auth_login.html')
+
+        if username == '' and password == '':
+
+            flash('لطفا نام کاربری و رمز عبور خودرا تکمیل کنید !')
+            return render_template('auth_login.html')       
+
+
 
     return render_template('auth_login.html')
 

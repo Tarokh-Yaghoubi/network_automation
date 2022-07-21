@@ -18,7 +18,7 @@ class Users(db.Model):
     username = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(250), nullable=False)
     email = db.Column(db.String(150), nullable=False, unique=True)
-    PhonNum = db.Column(db.String(11), nullable=False, unique=True)
+    PhonNum = db.Column(db.String(100), nullable=False, unique=True)
     status = db.Column(db.Boolean, default=False, nullable=False)
 
 
@@ -41,8 +41,7 @@ class Users(db.Model):
 
 class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False, unique=True)
-    Access = db.Column(db.String(250), nullable=False)
+    name = db.Column(db.String(200), nullable=False, unique=True)
 
     user_roles = db.relationship('UserRoles', backref='role', lazy=True)
 
@@ -55,8 +54,8 @@ class UserRoles(db.Model):
 
 class Licences(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    SetDate = db.Column(db.DateTime, nullable=False)
-    ExpiryDate = db.Column(db.DateTime, nullable=False)
+    SetDate = db.Column(db.DateTime(), nullable=False)
+    ExpiryDate = db.Column(db.DateTime(), nullable=False)
     code = db.Column(db.String(110), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     status = db.Column(db.Boolean, default=False, nullable=False)
@@ -92,8 +91,8 @@ class Schedules(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id', ondelete='CASCADE'), nullable=False)
     type = db.Column(db.String(100), nullable=False)
-    date1 = db.Column(db.DateTime, nullable=False)
-    date2 = db.Column(db.DateTime, nullable=False)
+    date1 = db.Column(db.DateTime(), nullable=False)
+    date2 = db.Column(db.DateTime(), nullable=False)
     status = db.Column(db.Boolean, default=False, nullable=False)
 
     setting_id = db.Column(db.Integer, db.ForeignKey('settings.id', ondelete='CASCADE'), nullable=False)

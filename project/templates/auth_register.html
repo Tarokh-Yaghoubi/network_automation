@@ -17,6 +17,16 @@
 </head>
 <body class="form">
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul class="flashes, warning">
+      {% for category, message in messages %}
+        <li class="{{ category }}" id="flash">{{ message }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
     <div class="form-container">
         <div class="form-form">
             <div class="form-form-wrap">
