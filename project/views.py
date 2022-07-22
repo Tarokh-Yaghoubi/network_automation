@@ -15,4 +15,22 @@ def errorpage(error):
 
 
 def page_not_found(e):
-  return render_template('error_404.html'), 404
+  return render_template('pages_error404.html'), 404
+
+
+@views.errorhandler(500)
+def errorpage(error):
+    return 'error 500', 500
+
+
+def page_not_found(e):
+  return render_template('pages_error500.html'), 500
+
+
+@views.errorhandler(503)
+def errorpage(error):
+    return 'error 503', 503
+
+
+def page_not_found(e):
+  return render_template('pages_error503.html'), 503

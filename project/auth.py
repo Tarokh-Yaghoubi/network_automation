@@ -4,7 +4,7 @@ from flask import (
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from project.models import Users, db
+from project.models import Users, Role, db
  
 from flask_login import login_required
 
@@ -14,19 +14,48 @@ from flask import Blueprint
 
 from flask import render_template_string
 
+from flask_user import user_registered
+
+
 
 auth = Blueprint('auth', __name__)
+
+
+
+    
+
 
 @auth.route('/')
 def index_page():
     
     if 'username' in session:
-        return f'Logged in as {session["username"]}'
+
+        flash(f'logged in as {session["username"]}')
+        return render_template('index.html')
     
     return render_template('auth_login.html')
 
+
 @auth.route('/register', methods=['POST', 'GET'])
 def register():
+
+    admin_role = Role(name='admin')
+    owner_role = Role(name='owner')
+    user_role = Role(name='user')
+    db.session.commit()
+
+    if not Users.query.filter(Users.username=='admin').first():
+        
+        user = Users(
+            username='admin',
+            email='yaghoubitarokh@outlook.com',
+            PhonNum = '09105664867',
+            password_hash = generate_password_hash('funlife2002')
+        )
+        user.roles.append(admin_role)
+        user.roles.append(owner_role)
+        db.session.add(user)
+        db.session.commit()
     
     if request.method == 'POST':
 
@@ -38,16 +67,30 @@ def register():
         password_hash = generate_password_hash(password)
 
         response = make_response(render_template('auth_login.html'))
-        session['username'] = username
-        session.permanent = True
 
 
-        if Users.query.filter_by(email=email).first() or Users.query.filter_by(username=username).first() or Users.query.filter_by(PhonNum=phone).first():
 
-            return "You have already signed-in ! , do you wanna <a href='/login'>login</a> ?"
+        if Users.query.filter_by(username=username).first():
 
-        else : 
+            flash(f'کاربر با نام کاربری {username} از قبل ثبت نام کرده است', 'error')
+            return render_template('auth_register.html')
+        
+        elif Users.query.filter_by(email=email).first():
 
+            flash(f'کاربر با این آدرس ایمیل از قبل ثبت نام کرده است', 'error')
+            return render_template('auth_register.html')
+
+        elif Users.query.filter_by(PhonNum=phone).first():
+
+            flash(f'کاربر با شماره تلفن {phone} از قبل ثبت نام کرده است', 'error')
+            return render_template('auth_register.html')
+
+
+
+
+        else:
+            
+            
             user = Users(
                 username = username,
                 email = email,
@@ -55,16 +98,14 @@ def register():
                 password_hash = password_hash
     
             )
-    
+
+            session['username'] = username
+            session.permanent = True
             db.session.add(user)
             db.session.commit()
-    
-            return response
-        
-    if len(phone) < 11 or len(phone) >= 12:
 
-            flash('شماره تلفن شما صحیح نیست', 'خطا')
-            return render_template('auth_register.html')
+            return response
+            
 
 
     return render_template('auth_register.html')
@@ -111,5 +152,14 @@ def login():
 @auth.route('/forgot_pass')
 def forgot_pass():
     return render_template('auth_pass_recovery_boxed.html')
+
+@auth.route('/logout')
+def logout():
+
+    for key in list(session.keys()):
+        session.pop(key)
+
+    flash('با موفقیت از سیستم خارج شدید', 'success')
+    return render_template('auth_login.html')
 
 

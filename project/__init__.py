@@ -42,8 +42,10 @@ def create_app():
     from project import views
     from .views import views as views_blueprint
     from .auth import auth as auth_blueprint
+    from .profile import profile as profile_blueprint
 
     app.register_blueprint(views_blueprint) 
     app.register_blueprint(auth_blueprint)    
+    app.register_blueprint(profile_blueprint)
     
     return app

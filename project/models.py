@@ -22,9 +22,11 @@ class Users(db.Model):
     status = db.Column(db.Boolean, default=False, nullable=False)
 
 
-    user_roles = db.relationship('UserRoles', backref='users', lazy=True)
+    # user_roles = db.relationship('UserRoles', backref='users', lazy=True)
     licenses = db.relationship('Licences', backref='users', lazy=True)
     settings = db.relationship('Settings', backref='users', lazy=True)
+
+    roles = db.relationship('Role', secondary='user_roles')
 
 
     @property
@@ -40,6 +42,7 @@ class Users(db.Model):
 
 
 class Role(db.Model):
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False, unique=True)
 
@@ -47,6 +50,7 @@ class Role(db.Model):
 
 
 class UserRoles(db.Model):
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     role_id = db.Column(db.Integer, db.ForeignKey('role.id', ondelete='CASCADE'), nullable=False)
