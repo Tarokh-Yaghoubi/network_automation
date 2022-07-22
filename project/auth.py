@@ -20,8 +20,6 @@ from flask_user import user_registered
 
 auth = Blueprint('auth', __name__)
 
-
-
     
 
 
