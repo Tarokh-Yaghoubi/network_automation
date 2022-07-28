@@ -1,6 +1,7 @@
 from flask import (
     flash, render_template, request, redirect, url_for, session
 )
+from pyrfc3339 import generate
 
 
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -30,7 +31,7 @@ def index_page():
     
     if 'username' in session:
 
-        flash(f'logged in as {session["username"]}')
+        flash(f'logged in as {session["username"]}', 'success')
         return render_template('index.html')
     
     return render_template('auth_login.html')
@@ -124,34 +125,31 @@ def register():
 
     return render_template('auth_register.html')
 
-@auth.route('/login')
-def login_route():
 
-    if session.get('username'):
-        
-        flash(f'logged in as {session.get("username")}')
-        return render_template('index.html')
-    else:
-
-        return redirect(url_for('login'))
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
 
+    if session.get('username'):
+        
+        if Users.query.filter(Users.username==session['username']).first():
 
+            return render_template('index.html')
+        else:
 
-    if request.method == 'POST':
+            return render_template('auth_login.html')
+
+    elif request.method == 'POST':
         
         username = request.form['username']        
         password = request.form['password']
         user = Users.query.filter_by(username=username).first()
         
-        session['username'] = username
-        session.permanent = True
 
         if user and check_password_hash(user.password_hash, password):
 
-
+            session['username'] = username            
+            session.permanent = True
             return render_template('index.html', username=username)
         
         else:
@@ -172,11 +170,6 @@ def login():
             flash('لطفا نام کاربری و رمز عبور خودرا تکمیل کنید !')
             return render_template('auth_login.html')       
 
-        if username or password is None:
-
-            username = False
-            password = False
-
 
     return render_template('auth_login.html')
 
@@ -187,10 +180,37 @@ def forgot_pass():
 @auth.route('/logout')
 def logout():
 
-    for key in list(session.keys()):
-        session.pop(key)
+    
+    session.pop("username", None)
+    session.clear()
 
     flash('با موفقیت از سیستم خارج شدید', 'success')
     return render_template('auth_login.html')
 
 
+@auth.route('/lock', methods=['GET', 'POST'])
+def lock():
+
+
+    user = Users.query.filter(Users.username==session['username']).first()
+    if  session.get('username'):
+
+        if request.method == 'POST':
+
+            password = request.form['password']
+
+            user = Users.query.filter(Users.username==session['username']).first()
+
+            if check_password_hash(user.password_hash, password):
+
+                return redirect(url_for('auth.index_page'))
+            
+            else:
+
+                flash('رمز عبور شما صحیح نمیباشد', 'error')
+    else:
+
+        flash('لطفا مجددا وارد شوید', 'error')
+        return render_template('auth_login.html')
+
+    return render_template('auth_lockscreen.html', user=user)                                  
