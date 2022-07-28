@@ -1,4 +1,5 @@
 from flask import Flask
+from project.models import Role
 from project.views import views
 import secrets 
 import os 
@@ -48,4 +49,6 @@ def create_app():
     app.register_blueprint(auth_blueprint)    
     app.register_blueprint(profile_blueprint)
     
+
+
     return app

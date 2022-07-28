@@ -20,7 +20,17 @@ from flask_user import user_registered
 
 auth = Blueprint('auth', __name__)
 
-    
+
+
+def roles():
+
+    global admin_role
+    global owner_role
+    global user_role
+
+    admin_role = Role.query.filter(Role.name=='admin').first()
+    owner_role = Role.query.filter(Role.name=='owner').first()
+    user_role = Role.query.filter(Role.name=='user').first()
 
 
 @auth.route('/')
@@ -36,11 +46,12 @@ def index_page():
 
 @auth.route('/register', methods=['POST', 'GET'])
 def register():
+    
+    global admin_role
+    global owner_role
+    global user_role
+    
 
-    admin_role = Role(name='admin')
-    owner_role = Role(name='owner')
-    user_role = Role(name='user')
-    db.session.commit()
 
     if not Users.query.filter(Users.username=='admin').first():
         
@@ -55,6 +66,19 @@ def register():
         db.session.add(user)
         db.session.commit()
     
+    if not Users.query.filter(Users.username=='tarokh_user').first():
+
+        user1 = Users (
+            username = 'tarokh_user',
+            email = 'tarokhgit@gmail.com',
+            PhonNum = '09035433406',
+            password_hash = generate_password_hash('tarokh_user_2004')
+        )
+
+        user1.roles.append(user_role)
+        db.session.add(user1)
+        db.session.commit()
+
     if request.method == 'POST':
 
         username = request.form['username']
@@ -97,8 +121,7 @@ def register():
     
             )
 
-            session['username'] = username
-            session.permanent = True
+            user.roles = [user_role,]
             db.session.add(user)
             db.session.commit()
 
