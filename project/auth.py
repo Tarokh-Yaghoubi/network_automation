@@ -2,6 +2,7 @@ from flask import (
     flash, render_template, request, redirect, url_for, session
 )
 
+
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from project.models import Users, Role, db
@@ -22,15 +23,6 @@ auth = Blueprint('auth', __name__)
 
 
 
-def roles():
-
-    global admin_role
-    global owner_role
-    global user_role
-
-    admin_role = Role.query.filter(Role.name=='admin').first()
-    owner_role = Role.query.filter(Role.name=='owner').first()
-    user_role = Role.query.filter(Role.name=='user').first()
 
 
 @auth.route('/')
@@ -47,11 +39,9 @@ def index_page():
 @auth.route('/register', methods=['POST', 'GET'])
 def register():
     
-    global admin_role
-    global owner_role
-    global user_role
-    
-
+    role_admin = Role.query.filter(Role.name=='admin').first()
+    role_owner = Role.query.filter(Role.name=='owner').first()
+    role_user = Role.query.filter(Role.name=='user').first()
 
     if not Users.query.filter(Users.username=='admin').first():
         
@@ -61,8 +51,10 @@ def register():
             PhonNum = '09105664867',
             password_hash = generate_password_hash('funlife2002')
         )
-        user.roles.append(admin_role)
-        user.roles.append(owner_role)
+       # user.roles.append(admin_role)
+       # user.roles.append(owner_role)
+        
+        user.roles = [role_admin, role_owner]
         db.session.add(user)
         db.session.commit()
     
@@ -75,7 +67,8 @@ def register():
             password_hash = generate_password_hash('tarokh_user_2004')
         )
 
-        user1.roles.append(user_role)
+        # user1.roles.append(user_role)
+        user1.roles = [role_user,]
         db.session.add(user1)
         db.session.commit()
 
@@ -121,7 +114,7 @@ def register():
     
             )
 
-            user.roles = [user_role,]
+            user.roles = [role_user,]
             db.session.add(user)
             db.session.commit()
 
@@ -131,8 +124,21 @@ def register():
 
     return render_template('auth_register.html')
 
+@auth.route('/login')
+def login_route():
+
+    if session.get('username'):
+        
+        flash(f'logged in as {session.get("username")}')
+        return render_template('index.html')
+    else:
+
+        return redirect(url_for('login'))
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
+
+
 
     if request.method == 'POST':
         
@@ -166,6 +172,10 @@ def login():
             flash('لطفا نام کاربری و رمز عبور خودرا تکمیل کنید !')
             return render_template('auth_login.html')       
 
+        if username or password is None:
+
+            username = False
+            password = False
 
 
     return render_template('auth_login.html')

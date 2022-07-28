@@ -1,13 +1,18 @@
+""" Database IMports """
+
 
 from flask import (
-    flash, render_template, request, redirect, session
+    flash, render_template, request, redirect, session, Flask
 )
+
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.sql import func
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy.sql import func
+
+
 db = SQLAlchemy()
 
 """ Database  { AriaData } """
@@ -126,4 +131,3 @@ class Commands(db.Model):
     priority = db.Column(db.Integer, nullable=False)
     content = db.Column(db.Text, nullable=False)
     setting_id = db.Column(db.Integer, db.ForeignKey('settings.id', ondelete='CASCADE'), nullable=False)
-

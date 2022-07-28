@@ -20,7 +20,7 @@ secret_key = secrets.token_hex(16)
 
 def create_app():
 
-    
+
     app = Flask(__name__)
     app.config['SECRET_KEY'] = secret_key
     app.register_error_handler(404, page_not_found)
@@ -48,7 +48,42 @@ def create_app():
     app.register_blueprint(views_blueprint) 
     app.register_blueprint(auth_blueprint)    
     app.register_blueprint(profile_blueprint)
-    
+
+    @app.after_request
+    def add_header(r):
+        """
+        Add headers to both force latest IE rendering engine or Chrome Frame,
+        and also to cache the rendered page for 10 minutes.
+        """
+        r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        r.headers["Pragma"] = "no-cache"
+        r.headers["Expires"] = "0"
+        r.headers['Cache-Control'] = 'public, max-age=0'
+        
+        return r
+
+    with app.app_context():
+
+        db.create_all()
+
+        if not Role.query.filter(Role.name=='admin').first():
+        
+            admin_role = Role(name='admin')
+            db.session.add(admin_role)
+            db.session.commit()
+
+        if not Role.query.filter(Role.name=='owner').first():
+
+            owner_role = Role(name='owner')
+            db.session.add(owner_role)
+            db.session.commit()
+
+        if not Role.query.filter(Role.name=='user').first():
+
+            user_role = Role(name='user')
+            db.session.add(user_role)
+            db.session.commit()
 
 
     return app
+    

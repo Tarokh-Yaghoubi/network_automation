@@ -61,6 +61,10 @@
     
     <!-- END GLOBAL MANDATORY SCRIPTS -->
     <script src="/static/assets/js/authentication/form-2.js"></script>
-
+    <script>
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+    </script>
 </body>
 </html>

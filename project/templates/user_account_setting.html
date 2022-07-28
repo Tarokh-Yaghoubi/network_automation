@@ -861,5 +861,10 @@
     <!-- <script src="plugins/tagInput/tags-input.js"></script> -->
     <script src="/static/assets/js/users/account-settings.js"></script>
     <!--  END CUSTOM SCRIPTS FILE  -->
+    <script>
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+    </script>
 </body>
 </html>
