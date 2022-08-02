@@ -1,11 +1,17 @@
 from flask import Flask
-from project.models import Role
+from project.models import Role, Users
 from project.views import views
 import secrets 
 import os 
 from datetime import timedelta
 from project.views import page_not_found
 from project.models import db
+from flask_user import UserManager
+ 
+from flask import Flask
+from flask_login import LoginManager, login_required
+from project.role_required import ROLE_required, not_ROLE
+from project.auth import login_manager
 
 """ Flask Application Factory """
 
@@ -24,6 +30,7 @@ def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = secret_key
     app.register_error_handler(404, page_not_found)
+    login_manager.init_app(app)
     app.permanent_session_lifetime = timedelta(days=3)
     db.init_app(app)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -40,14 +47,19 @@ def create_app():
     ) 
 
 
+
     from project import views
     from .views import views as views_blueprint
     from .auth import auth as auth_blueprint
     from .profile import profile as profile_blueprint
+    from .roles import roles as roles_blueprint
 
     app.register_blueprint(views_blueprint) 
     app.register_blueprint(auth_blueprint)    
     app.register_blueprint(profile_blueprint)
+    app.register_blueprint(roles_blueprint)
+
+
 
     @app.after_request
     def add_header(r):
@@ -83,6 +95,12 @@ def create_app():
             user_role = Role(name='user')
             db.session.add(user_role)
             db.session.commit()
+
+
+
+
+
+
 
 
     return app

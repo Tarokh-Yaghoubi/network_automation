@@ -12,13 +12,14 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy.sql import func
 
+from flask_user import UserMixin
 
 db = SQLAlchemy()
 
 """ Database  { AriaData } """
 
 
-class Users(db.Model):
+class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(250), nullable=False)
