@@ -16,7 +16,8 @@ def ROLE_required(func):
     '''
     @wraps(func)
     def decorated_view(*args, **kwargs):
-        if request.method in EXEMPT_METHODS:
+        pass
+        '''if request.method in EXEMPT_METHODS:
             return func(*args, **kwargs)
         elif current_app.config.get('LOGIN_DISABLED'):
             return func(*args, **kwargs)
@@ -27,7 +28,7 @@ def ROLE_required(func):
         # but this can be customized to require any desired specification.
         elif current_user.role != 'ROLE':
             return current_app.login_manager.not_ROLE()
-        return func(*args, **kwargs)
+        return func(*args, **kwargs)'''
     return decorated_view
 
 

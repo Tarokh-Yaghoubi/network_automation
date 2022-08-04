@@ -12,10 +12,10 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy.sql import func
 
-from flask_user import UserMixin
+from flask_user import current_user, login_required, roles_required, UserManager, UserMixin
 
 db = SQLAlchemy()
-
+import project as p
 """ Database  { AriaData } """
 
 
@@ -25,7 +25,7 @@ class Users(db.Model, UserMixin):
     password_hash = db.Column(db.String(250), nullable=False)
     email = db.Column(db.String(150), nullable=False, unique=True)
     PhonNum = db.Column(db.String(100), nullable=False, unique=True)
-    status = db.Column(db.Boolean, default=False, nullable=False)
+    is_enabled = db.Column(db.Boolean, default=False, nullable=False)
 
 
     # user_roles = db.relationship('UserRoles', backref='users', lazy=True)
@@ -45,7 +45,9 @@ class Users(db.Model, UserMixin):
 
     def varify_password(self, password):
         return check_password_hash(self.password_hash, password)
+ 
 
+user_manager = UserManager(p.app, db, Users)
 
 class Role(db.Model):
 
@@ -132,3 +134,5 @@ class Commands(db.Model):
     priority = db.Column(db.Integer, nullable=False)
     content = db.Column(db.Text, nullable=False)
     setting_id = db.Column(db.Integer, db.ForeignKey('settings.id', ondelete='CASCADE'), nullable=False)
+
+

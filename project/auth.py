@@ -5,7 +5,6 @@ from flask import (
 
 from flask_user import UserManager
 from flask_login import LoginManager, login_required, login_user
-from project.role_required import ROLE_required, not_ROLE
 
 from flask_user import roles_required
 
@@ -15,8 +14,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from project.models import Users, Role, db
  
-from flask_login import login_required
-
 from flask import make_response
 
 from flask import Blueprint
@@ -24,9 +21,11 @@ from flask import Blueprint
 from flask import render_template_string
 
 from flask_user import user_registered
+from flask_user import current_user, login_required, roles_required, UserManager, UserMixin
+
 
 from functools import wraps
-
+import project as p
 auth = Blueprint('auth', __name__)
 
 def login_required(f):
@@ -41,23 +40,10 @@ def login_required(f):
     return wrap
 
 
-
-LoginManager.not_ROLE = not_ROLE
-login_manager = LoginManager()
-login_manager.login_view = 'login'
-login_manager.not_ROLE_view = 'not_ROLE'
-
-
-@login_manager.user_loader
-def load_user(user_id):
-
-    try:
-
-        return Users.query.get_or_404(user_id)
-
-    except:
-
-        return None
+#LoginManager.not_ROLE = not_ROLE
+#login_manager = LoginManager()
+#login_manager.login_view = 'login'
+#login_manager.not_ROLE_view = 'not_ROLE'
 
 
 
@@ -194,7 +180,7 @@ def login():
             session['username'] = username  
             session['logged_in'] = 'True' 
             login_user(user)
-            current_user.role = user_role.name
+            current_user.role = ['user']
             session.permanent = True
             return render_template('index.html', username=username)
         
@@ -242,7 +228,7 @@ def logout():
 @auth.route('/lock', methods=['GET', 'POST'])
 @login_required
 def lock():
-
+    a=current_user.roles
     return 'lock'
 
     """

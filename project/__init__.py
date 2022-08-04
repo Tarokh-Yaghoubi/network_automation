@@ -7,11 +7,12 @@ from datetime import timedelta
 from project.views import page_not_found
 from project.models import db
 from flask_user import UserManager
- 
+from flask_user import roles_required
 from flask import Flask
-from flask_login import LoginManager, login_required
+#from flask_login import LoginManager, login_required
+
 from project.role_required import ROLE_required, not_ROLE
-from project.auth import login_manager
+#from project.auth import login_manager
 
 """ Flask Application Factory """
 
@@ -23,14 +24,12 @@ database = 'network_automation'
 
 
 secret_key = secrets.token_hex(16)
-
 def create_app():
 
 
     app = Flask(__name__)
     app.config['SECRET_KEY'] = secret_key
     app.register_error_handler(404, page_not_found)
-    login_manager.init_app(app)
     app.permanent_session_lifetime = timedelta(days=3)
     db.init_app(app)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -98,10 +97,6 @@ def create_app():
 
 
 
-
-
-
-
-
-    return app
+    
+    return app    
     
