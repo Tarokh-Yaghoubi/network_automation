@@ -2,13 +2,11 @@ from flask import (
     flash, render_template, request, redirect, url_for, session
 )
 
+from project.models import Role
 
-from flask_user import UserManager
-from flask_login import LoginManager, login_required, login_user
+# from flask_user import UserManager
 
-from flask_user import roles_required
-
-from flask_login import current_user
+# from flask_user import roles_required
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -20,8 +18,12 @@ from flask import Blueprint
 
 from flask import render_template_string
 
-from flask_user import user_registered
-from flask_user import current_user, login_required, roles_required, UserManager, UserMixin
+# from flask_user import user_registered
+
+# from flask_user import current_user, login_required, roles_required, UserManager, UserMixin
+
+
+# roles query
 
 
 from functools import wraps
@@ -38,12 +40,6 @@ def login_required(f):
             return redirect(url_for('auth.login'))
 
     return wrap
-
-
-#LoginManager.not_ROLE = not_ROLE
-#login_manager = LoginManager()
-#login_manager.login_view = 'login'
-#login_manager.not_ROLE_view = 'not_ROLE'
 
 
 
@@ -179,8 +175,6 @@ def login():
             user_role = Role.query.filter(Role.name=='user').first()
             session['username'] = username  
             session['logged_in'] = 'True' 
-            login_user(user)
-            current_user.role = ['user']
             session.permanent = True
             return render_template('index.html', username=username)
         
@@ -228,10 +222,7 @@ def logout():
 @auth.route('/lock', methods=['GET', 'POST'])
 @login_required
 def lock():
-    a=current_user.roles
-    return 'lock'
 
-    """
     user = Users.query.filter(Users.username==session['username']).first()
     if session.get('username'):
 
@@ -252,4 +243,5 @@ def lock():
 
         flash('لطفا مجددا وارد شوید', 'error')
         return render_template('auth_login.html')
-    return render_template('auth_lockscreen.html', user=user)  """
+
+    return render_template('auth_lockscreen.html', user=user) 

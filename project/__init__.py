@@ -1,4 +1,3 @@
-from flask import Flask
 from project.models import Role, Users
 from project.views import views
 import secrets 
@@ -6,12 +5,14 @@ import os
 from datetime import timedelta
 from project.views import page_not_found
 from project.models import db
-from flask_user import UserManager
-from flask_user import roles_required
-from flask import Flask
-#from flask_login import LoginManager, login_required
+# from flask_user import UserManager
+# from flask_user import roles_required
+from flask import Flask 
 
-from project.role_required import ROLE_required, not_ROLE
+# from flask_user import UserManager
+
+# from flask_login import LoginManager, login_required, login_user, current_user, UserMixin
+
 #from project.auth import login_manager
 
 """ Flask Application Factory """
@@ -23,6 +24,9 @@ port = '3306'
 database = 'network_automation'
 
 
+
+
+
 secret_key = secrets.token_hex(16)
 def create_app():
 
@@ -32,6 +36,7 @@ def create_app():
     app.register_error_handler(404, page_not_found)
     app.permanent_session_lifetime = timedelta(days=3)
     db.init_app(app)
+    login.init_app(app=app)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?{5}'.format(
     
@@ -46,17 +51,22 @@ def create_app():
     ) 
 
 
+    with app.app_context():
+
+        user_role = Role.query.get(3).name
+        owner_role = Role.query.get(2).name
+        admin_role = Role.query.get(1).name
+
 
     from project import views
     from .views import views as views_blueprint
     from .auth import auth as auth_blueprint
     from .profile import profile as profile_blueprint
-    from .roles import roles as roles_blueprint
-
+    
     app.register_blueprint(views_blueprint) 
     app.register_blueprint(auth_blueprint)    
     app.register_blueprint(profile_blueprint)
-    app.register_blueprint(roles_blueprint)
+    
 
 
 
@@ -99,4 +109,3 @@ def create_app():
 
     
     return app    
-    

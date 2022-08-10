@@ -12,10 +12,10 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy.sql import func
 
-from flask_user import current_user, login_required, roles_required, UserManager, UserMixin
+from flask_user import UserMixin
 
 db = SQLAlchemy()
-import project as p
+
 """ Database  { AriaData } """
 
 
@@ -25,7 +25,7 @@ class Users(db.Model, UserMixin):
     password_hash = db.Column(db.String(250), nullable=False)
     email = db.Column(db.String(150), nullable=False, unique=True)
     PhonNum = db.Column(db.String(100), nullable=False, unique=True)
-    is_enabled = db.Column(db.Boolean, default=False, nullable=False)
+    is_active = db.Column('is_active', db.Boolean, default=False, nullable=False)
 
 
     # user_roles = db.relationship('UserRoles', backref='users', lazy=True)
@@ -47,7 +47,6 @@ class Users(db.Model, UserMixin):
         return check_password_hash(self.password_hash, password)
  
 
-user_manager = UserManager(p.app, db, Users)
 
 class Role(db.Model):
 
