@@ -18,6 +18,11 @@ from flask import Blueprint
 
 from flask import render_template_string
 
+from project.models import Users
+
+from flask_login import current_user, login_user
+
+
 # from flask_user import user_registered
 
 # from flask_user import current_user, login_required, roles_required, UserManager, UserMixin
@@ -25,6 +30,10 @@ from flask import render_template_string
 
 # roles query
 
+def roles():
+
+    global role_admin
+    role_admin = Role.query.filter(Role.name=='admin').first()
 
 from functools import wraps
 import project as p
@@ -43,10 +52,9 @@ def login_required(f):
 
 
 
-
 @auth.route('/')
 def index_page():
-    
+    roles()
     if 'username' in session:
 
         flash(f'logged in as {session["username"]}', 'success')
@@ -149,10 +157,8 @@ def register():
 def login():
 
     if current_user.is_authenticated:
-
-        return redirect(url_for('auth.index_page'))
-
         
+        return redirect(url_for('index_page'))
 
     if session.get('username'):
         
@@ -176,7 +182,9 @@ def login():
             session['username'] = username  
             session['logged_in'] = 'True' 
             session.permanent = True
+            login_user(user)
             return render_template('index.html', username=username)
+            
         
         else:
 

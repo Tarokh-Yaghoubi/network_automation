@@ -5,6 +5,7 @@ from flask import (
     flash, render_template, request, redirect, session, Flask
 )
 
+from project import login
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.sql import func
@@ -47,6 +48,11 @@ class Users(db.Model, UserMixin):
         return check_password_hash(self.password_hash, password)
  
 
+@login.user_loader
+def load_user(id):
+    return Users.query.get(int(id))
+
+    
 
 class Role(db.Model):
 
